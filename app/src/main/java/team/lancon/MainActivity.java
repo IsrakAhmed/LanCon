@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText usernameEditText;
+    private EditText userNameEditText;
     private Button startButton;
 
     @Override
@@ -18,22 +18,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        usernameEditText = findViewById(R.id.usernameEditText);
+        userNameEditText = findViewById(R.id.userNameEditText);
         startButton = findViewById(R.id.startButton);
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = usernameEditText.getText().toString().trim();
+                String userName = userNameEditText.getText().toString().trim();
 
-                if (username.isEmpty()) {
+                if (userName.isEmpty()) {
                     Toast.makeText(MainActivity.this, "Please enter a username", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Navigate to ChatActivity and pass the username
-                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                intent.putExtra("USERNAME", username);
+                // Navigate to SelectionActivity and pass the userName
+                Intent intent = new Intent(MainActivity.this, SelectionActivity.class);
+                intent.putExtra("USERNAME", userName);
                 startActivity(intent);
             }
         });
