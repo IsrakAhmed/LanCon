@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_color"
     tools:context=".JoinServerActivity">
 
     <TextView
         android:id="@+id/headerTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Currently active servers"
+        android:text=""
         android:textSize="18sp"
         android:textColor="@android:color/black"
         app:layout_constraintTop_toTopOf="parent"

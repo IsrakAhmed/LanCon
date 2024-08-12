@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
                 String userName = userNameEditText.getText().toString().trim();
 
                 if (userName.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Please enter a username", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Please Enter A Username", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
