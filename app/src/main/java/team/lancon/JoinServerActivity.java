@@ -25,6 +25,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.ArrayList;
 import android.os.AsyncTask;
 
+import android.os.Handler;
+import android.os.Looper;
+
 public class JoinServerActivity extends AppCompatActivity {
 
     private ListView serverListView;
@@ -34,6 +37,10 @@ public class JoinServerActivity extends AppCompatActivity {
     private static final int SERVER_PORT = 12345; // The port for TCP connection
     private static String serverIp = null;
     private static String serverName = null;
+    private Handler handler;
+    private Runnable runnable;
+    private int dotCount = 0;
+    private static final int MAX_DOTS = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +52,13 @@ public class JoinServerActivity extends AppCompatActivity {
 
         headerTextView = findViewById(R.id.headerTextView);
 
-        headerTextView.setText("Searching For Active Servers....");
+        //headerTextView.setText("Searching For Active Servers....");
+
+        // Initialize the Handler before calling startDotAnimation()
+        handler = new Handler(Looper.getMainLooper());
+
+        // Start the dot animation
+        startDotAnimation();
 
         new DiscoverServersTask().execute();
 
@@ -80,6 +93,34 @@ public class JoinServerActivity extends AppCompatActivity {
                 showConnectDialog(selectedServer);
             }
         });*/
+    }
+
+    private void startDotAnimation() {
+
+        if (handler == null) {
+            handler = new Handler(Looper.getMainLooper());
+        }
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder dots = new StringBuilder();
+                for (int i = 0; i < dotCount; i++) {
+                    dots.append(".");
+                }
+                headerTextView.setText("Searching For Active Servers" + dots.toString());
+
+                dotCount = (dotCount + 1) % (MAX_DOTS + 1);
+
+                // Repeat the animation every 500ms (half a second)
+                handler.postDelayed(this, 500);
+            }
+        };
+
+        handler.post(runnable);
+    }
+
+    private void stopDotAnimation() {
+        handler.removeCallbacks(runnable);
     }
 
     private class DiscoverServersTask extends AsyncTask<Void, Void, HashMap<String, String>> {
@@ -194,6 +235,8 @@ public class JoinServerActivity extends AppCompatActivity {
         } catch (IOException e) {
             //Toast.makeText(JoinServerActivity.this, "Failed To Receive Server Broadcast.", Toast.LENGTH_SHORT).show();
         }
+
+        stopDotAnimation();
 
         return servers;
     }
