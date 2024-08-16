@@ -5,10 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,12 +37,15 @@ public class JoinServerActivity extends AppCompatActivity {
     private TextView headerTextView;
     private static final int DISCOVERY_PORT = 8888; // The port for UDP broadcast
     private static final int SERVER_PORT = 12345; // The port for TCP connection
-    private static String serverIp = null;
-    private static String serverName = null;
+    private String serverIp;
+    private String serverName;
+    private String userName;
     private Handler handler;
     private Runnable runnable;
     private int dotCount = 0;
     private static final int MAX_DOTS = 4;
+    private Button searchAgainButton;
+    private boolean isSearching = true; // Track search state
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +53,15 @@ public class JoinServerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_joinserver);
 
+        searchAgainButton = findViewById(R.id.searchAgain);
+        searchAgainButton.setVisibility(View.GONE);
+
         serverListView = findViewById(R.id.serverListView);
 
         headerTextView = findViewById(R.id.headerTextView);
+
+        // Get the username from the intent
+        userName = getIntent().getStringExtra("USERNAME");
 
         //headerTextView.setText("Searching For Active Servers....");
 
@@ -61,38 +72,6 @@ public class JoinServerActivity extends AppCompatActivity {
         startDotAnimation();
 
         new DiscoverServersTask().execute();
-
-        // list of active servers
-        /*serverList = discoverServerIPs();
-
-        //serverList.put("192.168.1.000", "Emni");
-
-        // Create a list to hold the formatted server information
-        List<String> serverDisplayList = new ArrayList<>();
-
-        for (HashMap.Entry<String, String> entry : serverList.entrySet()) {
-            String displayText = entry.getValue() + " - " + entry.getKey();
-            serverDisplayList.add(displayText);
-        }
-
-
-        if (serverDisplayList.isEmpty()) {
-            headerTextView.setText("No Active Server Found");
-        }
-
-        else {
-            headerTextView.setText("Currently Active Servers");
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.server_list_item, serverDisplayList);
-            serverListView.setAdapter(adapter);
-        }
-
-        serverListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedServer = serverList.get(position);
-                showConnectDialog(selectedServer);
-            }
-        });*/
     }
 
     private void startDotAnimation() {
@@ -135,12 +114,14 @@ public class JoinServerActivity extends AppCompatActivity {
 
             serverList = result;
 
-            serverList.put("192.168.1.000", "Emni");
+            //serverList.put("192.168.1.000", "Emni");
 
             List<String> serverDisplayList = new ArrayList<>();
 
+            stopDotAnimation();
+
             for (HashMap.Entry<String, String> entry : serverList.entrySet()) {
-                String displayText = entry.getValue() + " - " + entry.getKey();
+                String displayText = entry.getValue() + " @ " + entry.getKey();
                 serverDisplayList.add(displayText);
             }
 
@@ -152,6 +133,12 @@ public class JoinServerActivity extends AppCompatActivity {
                 serverListView.setAdapter(adapter);
             }
 
+            searchAgainButton.setVisibility(View.VISIBLE);
+
+            searchAgainButton.setText("Search Again"); // Reset button text
+
+            isSearching = false; // Reset search state
+
             serverListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -162,20 +149,66 @@ public class JoinServerActivity extends AppCompatActivity {
                     showConnectDialog(selectedServer);
                 }
             });
+
+            searchAgainButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isSearching) {
+                        stopSearch(); // Stop search if already searching
+
+                    } else {
+                        startSearch(); // Start search if not searching
+                    }
+                }
+            });
         }
+    }
+
+    private void startSearch() {
+
+        // Clear the list of servers by setting an empty adapter
+        ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(JoinServerActivity.this, R.layout.server_list_item, new ArrayList<>());
+        serverListView.setAdapter(emptyAdapter);
+
+        // Start the dot animation
+        startDotAnimation();
+
+        new DiscoverServersTask().execute();
+
+        searchAgainButton.setText("Stop Search"); // Update button text
+
+        isSearching = true; // Update search state
+    }
+
+    private void stopSearch() {
+        stopDotAnimation(); // Stop the dot animation
+
+        handler.removeCallbacks(runnable); // Stop any ongoing search task
+
+        searchAgainButton.setText("Search Again"); // Update button text
+
+        isSearching = false; // Update search state
     }
 
     private void showConnectDialog(final String serverInfo) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Connect To Server");
-        builder.setMessage("Do You Want To Connect To " + serverInfo + " ?");
+
+        String[] infoServer = serverInfo.split(" @ ");
+
+        builder.setMessage("Do You Want To Connect To " + infoServer[0] + " @ " + infoServer[1] + " ?");
 
         builder.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //Toast.makeText(JoinServerActivity.this, "Okay, Connecting...", Toast.LENGTH_SHORT).show();
                 // Implement connection logic here
+
+                serverName = infoServer[0];
+                serverIp = infoServer[1];
+
+                connectServer(serverName, serverIp);
             }
         });
 
@@ -208,7 +241,7 @@ public class JoinServerActivity extends AppCompatActivity {
 
             //Toast.makeText(JoinServerActivity.this, "Listening For Server Broadcasts...", Toast.LENGTH_SHORT).show();
 
-            while (System.currentTimeMillis() - startTime < timeoutPeriod) {
+            while (System.currentTimeMillis() - startTime < timeoutPeriod && isSearching) {
                 try {
                     socket.receive(packet); // Receive the broadcast packet
 
@@ -240,5 +273,45 @@ public class JoinServerActivity extends AppCompatActivity {
 
         return servers;
     }
+
+    private void connectServer(String serverName, String serverIp) {
+        new ConnectTask().execute(serverIp, serverName);
+    }
+
+    private class ConnectTask extends AsyncTask<String, Void, Boolean> {
+        private String serverName;
+        private String serverIp;
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            serverIp = params[0];
+            serverName = params[1];
+
+            try {
+                NetworkConnection networkConnection = new NetworkConnection(serverIp, SERVER_PORT);
+                return true; // Connection successful
+            } catch (IOException e) {
+                return false; // Connection failed
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                // Navigate to HomeActivity and pass the userName, serverIp, serverName
+                Intent intent = new Intent(JoinServerActivity.this, HomeActivity.class);
+
+                intent.putExtra("USERNAME", userName);
+                intent.putExtra("serverIp", serverIp);
+                intent.putExtra("serverName", serverName);
+                intent.putExtra("serverOwner", "NO");
+
+                startActivity(intent);
+            } else {
+                Toast.makeText(JoinServerActivity.this, "Unable To Connect To The Server.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
 }

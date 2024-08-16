@@ -12,6 +12,7 @@ import android.widget.Toast;
 public class SelectionActivity extends AppCompatActivity {
 
     private Button joinServerButton, startServerButton;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +23,7 @@ public class SelectionActivity extends AppCompatActivity {
         startServerButton = findViewById(R.id.startServer);
 
         // Get the username from the intent
-        String userName = getIntent().getStringExtra("USERNAME");
+        userName = getIntent().getStringExtra("USERNAME");
 
         joinServerButton.setOnClickListener(new View.OnClickListener() {
             @Override
