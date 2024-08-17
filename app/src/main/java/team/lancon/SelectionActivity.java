@@ -43,7 +43,12 @@ public class SelectionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(SelectionActivity.this, "Server Started", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SelectionActivity.this, "Server Started", Toast.LENGTH_SHORT).show();
+
+                // Navigate to StartServerActivity and pass the userName
+                Intent intent = new Intent(SelectionActivity.this, StartServerActivity.class);
+                intent.putExtra("USERNAME", userName);
+                startActivity(intent);
 
             }
         });
