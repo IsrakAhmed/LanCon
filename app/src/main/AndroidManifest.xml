@@ -39,6 +39,10 @@
 
         </activity>
 
+        <activity android:name=".StartServerActivity">
+
+        </activity>
+
         <activity android:name=".HomeActivity">
 
         </activity>
