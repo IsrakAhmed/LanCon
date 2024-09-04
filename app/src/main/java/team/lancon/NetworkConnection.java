@@ -1,5 +1,7 @@
 package team.lancon;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,24 +24,26 @@ public class NetworkConnection {
         objectInputStream = new ObjectInputStream(socket.getInputStream());
     }
 
-    public void write(Object obj){
+    public synchronized void write(Data dataObj){
         try {
-            objectOutputStream.writeObject(obj);
-        } catch (IOException ex) {
+            objectOutputStream.writeObject(dataObj);
+        } catch (Exception e) {
             //System.out.println("Failed to write");
             //throw ex;
+            Log.e("HomeActivity", e.toString());
         }
     }
 
-    public Object read(){
-        Object object;
+    public /*synchronized*/ Data read(){
+        Data dataObj;
         try {
-            object = objectInputStream.readObject();
-        } catch (Exception ex) {
+            dataObj = (Data) objectInputStream.readObject();
+        } catch (Exception e) {
             //System.out.println("Failed to read");
+            Log.e("HomeActivity", e.toString());
             return null;
         }
-        return object;
+        return dataObj;
     }
 
     public Socket getSocket() {

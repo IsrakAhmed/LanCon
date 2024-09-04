@@ -1,6 +1,7 @@
 package team.lancon;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -25,6 +26,12 @@ import java.net.Socket;
 import java.util.HashMap;
 
 public class StartServerActivity extends AppCompatActivity {
+
+    private static final int TCP_PORT = 12345;
+    private static final int BROADCAST_PORT = 8888;
+    private String SERVER_NAME;
+    private String SERVER_IP;
+    ServerSocket serverSocket;
 
     private String userName;
     private EditText serverNameEditText;
@@ -89,9 +96,26 @@ public class StartServerActivity extends AppCompatActivity {
 
                                 Toast.makeText(StartServerActivity.this, "Server Started Successfully", Toast.LENGTH_SHORT).show();
                             }, 5000); // 5 seconds delay for demonstration purposes
+
+                            new android.os.Handler().postDelayed(() -> {
+
+                                // Navigate to HomeActivity and pass the USERNAME, serverIp, serverName and serverOwner
+                                Intent intent = new Intent(StartServerActivity.this, HomeActivity.class);
+
+                                intent.putExtra("USERNAME", userName);
+                                intent.putExtra("userIp", SERVER_IP);
+                                intent.putExtra("serverIp", SERVER_IP);
+                                intent.putExtra("serverName", SERVER_NAME);
+                                intent.putExtra("serverOwner", "YES");
+
+                                startActivity(intent);
+
+                            }, 5000); // 5 seconds delay for demonstration purposes
+
                         });
 
                     }).start();
+
                 }
             }
         });
@@ -128,11 +152,6 @@ public class StartServerActivity extends AppCompatActivity {
 
     private class ServerMain {
 
-        private static final int TCP_PORT = 12345;
-        private static final int BROADCAST_PORT = 8888;
-
-        private String SERVER_NAME;
-
         ServerMain(String serverName) {
             try {
 
@@ -142,23 +161,13 @@ public class StartServerActivity extends AppCompatActivity {
                 new Thread(() -> broadcastServerIp()).start();
 
                 // Start TCP server
-                ServerSocket serverSocket = new ServerSocket(TCP_PORT);
+                serverSocket = new ServerSocket(TCP_PORT);
 
-                Toast.makeText(StartServerActivity.this, "Server Created With Name: " + serverName, Toast.LENGTH_SHORT).show();
+                ServerSocketManager.getInstance().setServerSocket(serverSocket);
 
                 //System.out.println("Server Started...");
                 //System.out.println("Server IP: " + InetAddress.getLocalHost().getHostAddress());
 
-                // Map to store client information
-                HashMap<String, Information> clientList = new HashMap<>();
-
-                /*while (true) {
-                    Socket socket = serverSocket.accept();
-                    //System.out.println("New client connected: " + socket.getInetAddress().getHostAddress());
-
-                    NetworkConnection networkConnection = new NetworkConnection(socket);
-                    new Thread(new CreateConnection(clientList, networkConnection)).start();
-                }*/
             } catch (Exception e) {
                 //System.err.println("Server error: " + e.getMessage());
                 //e.printStackTrace();
@@ -173,6 +182,8 @@ public class StartServerActivity extends AppCompatActivity {
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                 int ipAddress = wifiInfo.getIpAddress();
                 String ipAddressString = formatIpAddress(ipAddress);
+
+                SERVER_IP = ipAddressString;
 
                 //String serverIp = InetAddress.getLocalHost().getHostAddress();
 

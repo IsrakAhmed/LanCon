@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -40,6 +42,7 @@ public class JoinServerActivity extends AppCompatActivity {
     private String serverIp;
     private String serverName;
     private String userName;
+    private String userIp;
     private Handler handler;
     private Runnable runnable;
     private int dotCount = 0;
@@ -62,6 +65,8 @@ public class JoinServerActivity extends AppCompatActivity {
 
         // Get the username from the intent
         userName = getIntent().getStringExtra("USERNAME");
+
+        userIp = getMyIp();
 
         //headerTextView.setText("Searching For Active Servers....");
 
@@ -289,6 +294,9 @@ public class JoinServerActivity extends AppCompatActivity {
 
             try {
                 NetworkConnection networkConnection = new NetworkConnection(serverIp, SERVER_PORT);
+
+                ClientNCManager.getInstance().setNetworkConnection(networkConnection);
+
                 return true; // Connection successful
             } catch (IOException e) {
                 return false; // Connection failed
@@ -302,6 +310,7 @@ public class JoinServerActivity extends AppCompatActivity {
                 Intent intent = new Intent(JoinServerActivity.this, HomeActivity.class);
 
                 intent.putExtra("USERNAME", userName);
+                intent.putExtra("userIp", userIp);
                 intent.putExtra("serverIp", serverIp);
                 intent.putExtra("serverName", serverName);
                 intent.putExtra("serverOwner", "NO");
@@ -311,6 +320,22 @@ public class JoinServerActivity extends AppCompatActivity {
                 Toast.makeText(JoinServerActivity.this, "Unable To Connect To The Server.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private String getMyIp(){
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int ipAddress = wifiInfo.getIpAddress();
+
+        return formatIpAddress(ipAddress);
+    }
+
+    private String formatIpAddress(int ipAddress) {
+        return String.format("%d.%d.%d.%d",
+                (ipAddress & 0xff),
+                (ipAddress >> 8 & 0xff),
+                (ipAddress >> 16 & 0xff),
+                (ipAddress >> 24 & 0xff));
     }
 
 
