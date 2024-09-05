@@ -1,10 +1,12 @@
 package team.lancon;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -207,6 +209,30 @@ public class HomeActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     setActiveButton(activePipsButton);
                     setInactiveButton(convosButton);
+
+                    conversationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            // Get the server name from the adapter at the clicked position
+                            String selectedPip = (String) parent.getItemAtPosition(position);
+
+                            String[] selectedPipInfo = selectedPip.split(" @ ");
+
+                            String receiversUserName = selectedPipInfo[0];
+                            String receiversUserIp = selectedPipInfo[1];
+
+                            // Navigate to ConversationActivity and pass the userName, serverIp, serverName
+                            Intent intent = new Intent(HomeActivity.this, ConversationActivity.class);
+
+                            intent.putExtra("serverIp", serverIp);
+                            intent.putExtra("serverName", serverName);
+                            intent.putExtra("receiversUserName", receiversUserName);
+                            intent.putExtra("receiversUserIp", receiversUserIp);
+
+                            startActivity(intent);
+                        }
+                    });
                 });
             }).start();
         });
