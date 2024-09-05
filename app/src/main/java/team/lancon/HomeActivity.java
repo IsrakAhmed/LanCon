@@ -222,7 +222,7 @@ public class HomeActivity extends AppCompatActivity {
                             String receiversUserName = selectedPipInfo[0];
                             String receiversUserIp = selectedPipInfo[1];
 
-                            // Navigate to ConversationActivity and pass the userName, serverIp, serverName
+                            // Navigate to ConversationActivity and pass the serverIp, serverName, receiversUserName, receiversUserIp
                             Intent intent = new Intent(HomeActivity.this, ConversationActivity.class);
 
                             intent.putExtra("serverIp", serverIp);
