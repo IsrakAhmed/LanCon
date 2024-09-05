@@ -34,6 +34,7 @@ public class HomeActivity extends AppCompatActivity {
     private ServerRepository serverRepository;
     ServerSocket serverSocket;
     NetworkConnection networkConnection;
+    ServerNCManager serverNCManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +81,9 @@ public class HomeActivity extends AppCompatActivity {
 
             userRepository.addUser(userName, userIp);
 
-
             serverSocket = ServerSocketManager.getInstance().getServerSocket();
+
+            serverNCManager = ServerNCManager.getInstance();
 
             new Thread(() -> {
                 // Map to store client information
@@ -281,6 +283,15 @@ public class HomeActivity extends AppCompatActivity {
                     newUserName = userInfo[1];
 
                     userRepository.addUser(newUserName, newUserIP);
+
+                    List<HashMap<String, NetworkConnection>> clientConnections = serverNCManager.getClientConnections();
+
+                    // Create a new user
+                    HashMap<String, NetworkConnection> newUserMap = new HashMap<>();
+                    newUserMap.put(newUserIP, networkConnection);
+
+                    // Add the new user to the list
+                    clientConnections.add(newUserMap);
 
                     flag = false;
                 }
