@@ -38,13 +38,11 @@ public class LanConDatabaseHelper extends SQLiteOpenHelper {
         // Create Conversations table
         String CREATE_CONVERSATIONS_TABLE = "CREATE TABLE conversations (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "from_user_id INTEGER NOT NULL," +
-                "to_user_id INTEGER NOT NULL," +
+                "from_user_ip TEXT NOT NULL," +
+                "to_user_ip TEXT NOT NULL," +
                 "message TEXT NOT NULL," +
                 "message_type TEXT NOT NULL," +
-                "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP," +
-                "FOREIGN KEY(from_user_id) REFERENCES users(id)," +
-                "FOREIGN KEY(to_user_id) REFERENCES users(id)" +
+                "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP" +
                 ");";
         db.execSQL(CREATE_CONVERSATIONS_TABLE);
 
