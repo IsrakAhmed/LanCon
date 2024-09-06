@@ -1,6 +1,10 @@
 package team.lancon;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +16,8 @@ public class ConversationActivity extends AppCompatActivity {
     private ServerRepository serverRepository;
     private TextView receiversNameTextView;
     private String serverIp, serverName, receiversUserName, receiversUserIp;
+    private EditText messageEditText;
+    private ImageButton sendMessageButton;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,24 @@ public class ConversationActivity extends AppCompatActivity {
         receiversUserIp = getIntent().getStringExtra("receiversUserIp");
 
         receiversNameTextView.setText(receiversUserName);
+
+        messageEditText = findViewById(R.id.messageEditText);
+        sendMessageButton = findViewById(R.id.sendMessageButton);
+
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Enable/Disable send button based on message input
+                sendMessageButton.setEnabled(s.toString().trim().length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
 
     }
 }
