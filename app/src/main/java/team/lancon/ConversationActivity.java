@@ -8,6 +8,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import team.lancon.MessagesAdapter;
+import team.lancon.Message;
 
 public class ConversationActivity extends AppCompatActivity {
 
@@ -18,6 +26,9 @@ public class ConversationActivity extends AppCompatActivity {
     private String serverIp, serverName, receiversUserName, receiversUserIp;
     private EditText messageEditText;
     private ImageButton sendMessageButton;
+    private RecyclerView messagesRecyclerView;
+    private MessagesAdapter messagesAdapter;
+    private List<Message> messagesList;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +71,20 @@ public class ConversationActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
+
+        messagesRecyclerView = findViewById(R.id.messagesRecyclerView);
+        messagesList = new ArrayList<>();
+
+        // Sample messages for testing
+        messagesList.add(new Message("Hello, how are you?", false));  // Received message
+        messagesList.add(new Message("I'm good, thank you!", true));  // Sent message
+        messagesList.add(new Message("Great to hear!", false));  // Received message
+        messagesList.add(new Message("What about you?", true));  // Sent message
+
+        messagesAdapter = new MessagesAdapter(messagesList);
+        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        messagesRecyclerView.setAdapter(messagesAdapter);
 
 
     }
