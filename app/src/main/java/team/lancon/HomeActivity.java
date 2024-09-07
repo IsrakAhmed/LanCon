@@ -1,8 +1,11 @@
 package team.lancon;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +57,9 @@ public class HomeActivity extends AppCompatActivity {
         userRepository = new UserRepository(this);
         serverRepository = new ServerRepository(this);
 
-        clearDatabase();
+        MessageListManager.getInstance().setConversationRepository(conversationRepository);
+
+        //clearDatabase();
 
         serverPassword = null;
 
@@ -117,7 +122,7 @@ public class HomeActivity extends AppCompatActivity {
 
             networkConnection = ClientNCManager.getInstance().getNetworkConnection();
 
-            new Thread(new ReaderWriterServer(userName, networkConnection, userRepository)).start();
+            new Thread(new ReaderWriterServer(userName, getMyIp(), networkConnection, userRepository)).start();
 
             /*new Thread(() -> {
 
@@ -224,11 +229,12 @@ public class HomeActivity extends AppCompatActivity {
                             String receiversUserName = selectedPipInfo[0];
                             String receiversUserIp = selectedPipInfo[1];
 
-                            // Navigate to ConversationActivity and pass the serverIp, serverName, receiversUserName, receiversUserIp
+                            // Navigate to ConversationActivity and pass the serverIp, serverName, serverOwner, receiversUserName, receiversUserIp
                             Intent intent = new Intent(HomeActivity.this, ConversationActivity.class);
 
                             intent.putExtra("serverIp", serverIp);
                             intent.putExtra("serverName", serverName);
+                            intent.putExtra("serverOwner", serverOwner);
                             intent.putExtra("receiversUserName", receiversUserName);
                             intent.putExtra("receiversUserIp", receiversUserIp);
 
@@ -244,7 +250,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        clearDatabase();
+        //clearDatabase();
     }
 
 
@@ -298,7 +304,7 @@ public class HomeActivity extends AppCompatActivity {
             } catch (Exception e) {}
         }
 
-        new Thread(new ReaderWriterServer(userName, networkConnection, userRepository)).start();
+        new Thread(new ReaderWriterServer(userName, getMyIp(), networkConnection, userRepository)).start();
     }
 
     private void showActivePips(List<HashMap<String, Object>> userList){
@@ -377,5 +383,22 @@ public class HomeActivity extends AppCompatActivity {
         if (userRepository.getDBHelper() != null) {
             userRepository.getDBHelper().clearDatabase();
         }
+    }
+
+
+    private String getMyIp(){
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int ipAddress = wifiInfo.getIpAddress();
+
+        return formatIpAddress(ipAddress);
+    }
+
+    private String formatIpAddress(int ipAddress) {
+        return String.format("%d.%d.%d.%d",
+                (ipAddress & 0xff),
+                (ipAddress >> 8 & 0xff),
+                (ipAddress >> 16 & 0xff),
+                (ipAddress >> 24 & 0xff));
     }
 }

@@ -11,13 +11,14 @@ import java.util.Objects;
 
 public class ReaderWriterServer implements Runnable {
 
-    String userName;
+    String userName, userIp;
     NetworkConnection networkConnection;
     HashMap<String, Information> clientList;
     UserRepository userRepository;
 
-    public ReaderWriterServer(String userName, NetworkConnection networkConnection, UserRepository userRepository) {
+    public ReaderWriterServer(String userName, String userIp, NetworkConnection networkConnection, UserRepository userRepository) {
         this.userName = userName;
+        this.userIp = userIp;
         this.networkConnection = networkConnection;
         this.userRepository = userRepository;
     }
@@ -90,94 +91,36 @@ public class ReaderWriterServer implements Runnable {
 
                         //Thread.sleep(1000);
                     }
+
+                    else {
+                        if(Objects.equals(dataObj.receiversUserIp, userIp)) {
+                            //List<Message> messagesList = MessageListManager.getInstance().getMessagesList();
+
+                            //messagesList.add(new Message(dataObj.message, false));  // Received message
+
+                            MessageListManager.getInstance().getConversationRepository().addConversation(dataObj.sendersUserIp, dataObj.receiversUserIp, dataObj.message,"Plain Text");
+
+
+                            MessageListManager.getInstance().notifyDataChanged();
+                        }
+
+                        else {
+                            List<HashMap<String, NetworkConnection>> clientConnections = ServerNCManager.getInstance().getClientConnections();
+
+                            String targetIP = dataObj.receiversUserIp;
+
+                            for (HashMap<String, NetworkConnection> userMap : clientConnections) {
+                                if (userMap.containsKey(targetIP)) {
+                                    userMap.get(targetIP).write(dataObj);
+                                }
+                            }
+                        }
+                    }
+
                 } else {
                     Log.e("HomeActivity", "null data object is read");
                 }
 
-
-                //if (actualMessage.toLowerCase().contains("list")) {
-
-                //System.out.println("List asked.." + actualMessage);
-
-                /*String words[] = actualMessage.split("\\$");*/
-
-                /*
-                words[0] = Sender Name
-                words[1] = Receiver Name
-                words[2] = keyword
-                words[3] = message/null
-                */
-
-                //System.out.println("Client List: \n" + clientList);
-
-                /*Information information = clientList.get(words[0]);
-
-                String msgToSend = new String("List of Clients...\n");
-
-                for (Map.Entry<String, Information> entry : clientList.entrySet()) {
-
-                    String key = entry.getKey();
-                    //Information value = entry.getValue();
-                    msgToSend = new String(msgToSend + key + "\n");
-                    //System.out.println(key);
-
-                }*/
-
-                /*Object object = msgToSend;*/
-
-                //System.out.println("sending.." + msgToSend);
-                //System.out.println("words0: " + words[0]);
-
-                /*information.networkConnection.write(msgToSend);*/
-
-                //String messageToSend=username+" -> "+sendMsg;
-                //Data data=new Data();
-                //data.message=messageToSend;
-                //}
-
-                //if (actualMessage.toLowerCase().contains("ip")){
-
-                //String words[] = actualMessage.split("\\$");
-
-                /*
-                words[0] = Sender Name
-                words[1] = Receiver Name
-                words[2] = keyword = ip
-                words[3] = message/null
-                */
-
-                //System.out.println("Client List: \n" + clientList);
-
-                /*Information information = clientList.get(words[0]);
-                String msgToSend = new String("Your PORT: \n");
-                msgToSend += information.networkConnection.getSocket().getLocalAddress().getHostAddress();
-                Object object = msgToSend;*/
-
-                //System.out.println("sending.." + msgToSend);
-                //System.out.println("words0: " + words[0]);
-
-                //information.networkConnection.write(msgToSend);
-                //}
-                //if (actualMessage.toLowerCase().contains("send")){
-
-                //String words[] = actualMessage.split("\\$");
-
-                /*
-                words[0] = Sender Name
-                words[1] = Receiver Name
-                words[2] = keyword = send
-                words[3] = message
-                */
-
-                /*Information information = clientList.get(words[1]);
-                String msgToSend = words[0]+" says: " + words[3];
-                Object object = msgToSend;*/
-
-                //System.out.println("sending.." + msgToSend);
-                //System.out.println("words0: " + words[0]);
-
-                //information.networkConnection.write(msgToSend);
-                //}
             }
             catch (Exception e){
                 Log.e("HomeActivity", String.valueOf(e));
