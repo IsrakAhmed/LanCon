@@ -12,6 +12,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText userNameEditText;
     private Button startButton;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
 
         userNameEditText = findViewById(R.id.userNameEditText);
         startButton = findViewById(R.id.startButton);
+
+        userRepository = new UserRepository(this);
+
+        clearDatabase();
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,5 +42,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void clearDatabase() {
+        if (userRepository.getDBHelper() != null) {
+            userRepository.getDBHelper().clearDatabase();
+        }
     }
 }

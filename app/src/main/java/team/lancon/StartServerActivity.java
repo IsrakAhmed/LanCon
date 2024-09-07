@@ -41,8 +41,8 @@ public class StartServerActivity extends AppCompatActivity {
     private Runnable runnable;
     private int dotCount = 0;
     private static final int MAX_DOTS = 4;
-
     private ProgressBar progressBar;
+    private UserRepository userRepository;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +50,10 @@ public class StartServerActivity extends AppCompatActivity {
 
         // Get the username from the intent
         userName = getIntent().getStringExtra("USERNAME");
+
+        userRepository = new UserRepository(this);
+
+        clearDatabase();
 
         // Initialize views
         serverNameEditText = findViewById(R.id.serverNameEditText);
@@ -215,6 +219,13 @@ public class StartServerActivity extends AppCompatActivity {
                     (ipAddress >> 8 & 0xff),
                     (ipAddress >> 16 & 0xff),
                     (ipAddress >> 24 & 0xff));
+        }
+    }
+
+
+    private void clearDatabase() {
+        if (userRepository.getDBHelper() != null) {
+            userRepository.getDBHelper().clearDatabase();
         }
     }
 

@@ -49,6 +49,7 @@ public class JoinServerActivity extends AppCompatActivity {
     private static final int MAX_DOTS = 4;
     private Button searchAgainButton;
     private boolean isSearching = true; // Track search state
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,10 @@ public class JoinServerActivity extends AppCompatActivity {
         serverListView = findViewById(R.id.serverListView);
 
         headerTextView = findViewById(R.id.headerTextView);
+
+        userRepository = new UserRepository(this);
+
+        clearDatabase();
 
         // Get the username from the intent
         userName = getIntent().getStringExtra("USERNAME");
@@ -319,6 +324,12 @@ public class JoinServerActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(JoinServerActivity.this, "Unable To Connect To The Server.", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private void clearDatabase() {
+        if (userRepository.getDBHelper() != null) {
+            userRepository.getDBHelper().clearDatabase();
         }
     }
 
