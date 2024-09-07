@@ -7,6 +7,7 @@ import java.util.HashMap;
 public class Data implements Serializable, Cloneable {
 
     public String message;
+    public String sendersUserIp, receiversUserIp;
     private List<HashMap<String, Object>> userList;
 
     // Fields for file transfer
