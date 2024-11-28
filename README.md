@@ -143,11 +143,6 @@ The application will run on Android devices with version 5.0 (Lollipop) and abov
 **Github**: [Israk Ahmed](https://github.com/IsrakAhmed)  
 **LinkedIn**: [Israk Ahmed](https://www.linkedin.com/in/israkahmed)
 
-**Name**: Sajib  
-**E-Mail**: sksojib5688@gmail.com  
-**Github**: [MD-SAJIB-AHAMED](https://github.com/MD-SAJIB-AHAMED)  
-**LinkedIn**: [MD Sajib](https://www.linkedin.com/in/md-sajib-2833a22a0)
-
 ---
 
 This document covers the essential requirements and specifications for the LanCon application. It serves as a guideline for the development and testing phases of the project.
