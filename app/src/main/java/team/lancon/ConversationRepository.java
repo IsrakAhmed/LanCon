@@ -13,13 +13,18 @@ public class ConversationRepository {
     }
 
     // Add a new conversation
-    public long addConversation(String fromUserIp, String toUserIp, String message, String messageType) {
+    public long addConversation(String fromUserIp, String toUserIp, String message, String messageType, byte[] imageData) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("from_user_ip", fromUserIp);
         values.put("to_user_ip", toUserIp);
-        values.put("message", message);
+        values.put("message", message != null ? message : "Image");
         values.put("message_type", messageType);
+
+        if ("Image".equals(messageType) && imageData != null) {
+            values.put("image_data", imageData);  // Store image as BLOB
+        }
+
         return db.insert("conversations", null, values);
     }
 

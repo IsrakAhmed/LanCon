@@ -39,6 +39,8 @@ public class ReaderWriterServer implements Runnable {
 
                 if (dataObj != null) {
 
+                    Log.e("HomeActivity", "File Type : " + dataObj.getFileType());
+
                     String actualMessage = dataObj.message;
 
                     if (Objects.equals(actualMessage, "GET_USERNAME")) {
@@ -98,7 +100,13 @@ public class ReaderWriterServer implements Runnable {
 
                             //messagesList.add(new Message(dataObj.message, false));  // Received message
 
-                            MessageListManager.getInstance().getConversationRepository().addConversation(dataObj.sendersUserIp, dataObj.receiversUserIp, dataObj.message,"Plain Text");
+                            if (Objects.equals(actualMessage, "Image")) {
+                                MessageListManager.getInstance().getConversationRepository().addConversation(dataObj.sendersUserIp, dataObj.receiversUserIp, null,"Image", dataObj.getFileData());
+                            }
+
+                            else {
+                                MessageListManager.getInstance().getConversationRepository().addConversation(dataObj.sendersUserIp, dataObj.receiversUserIp, dataObj.message,"Plain Text",null);
+                            }
 
 
                             MessageListManager.getInstance().notifyDataChanged();

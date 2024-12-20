@@ -42,6 +42,7 @@ public class LanConDatabaseHelper extends SQLiteOpenHelper {
                 "to_user_ip TEXT NOT NULL," +
                 "message TEXT NOT NULL," +
                 "message_type TEXT NOT NULL," +
+                "image_data BLOB," +
                 "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP" +
                 ");";
         db.execSQL(CREATE_CONVERSATIONS_TABLE);
